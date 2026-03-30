@@ -1,199 +1,148 @@
-# Hostel Management System
+# Hostel Management System (MERN)
 
-A comprehensive Hostel Management System built with MERN stack (MongoDB, Express, React, Node.js).
+A full-stack **Hostel Management System** built using the **MERN stack (MongoDB, Express, React, Node.js)** with **JWT authentication** and **role-based access control**.
 
-## Project Structure
+- **Admin**: manage users, students, rooms, fees, complaints
+- **Warden**: manage hostel operations (complaints, leave approvals, visitors, rooms/students view)
+- **Student**: submit complaints, leave requests, visitor entries; view fees, notices, mess
 
-```
-HostelManagementSystem/
-├── server/                 # Backend
-│   ├── config/            # Configuration files
-│   ├── controllers/       # Route controllers
-│   ├── middleware/        # Custom middleware
-│   ├── models/            # Mongoose models
-│   ├── routes/            # Express routes
-│   ├── services/          # Business logic
-│   └── index.js           # Server entry point
-└── package.json
-```
+Repository: `https://github.com/NrushanshGarasia/SDP_PROJECT`
+
+---
 
 ## Features
 
-- JWT Authentication
-- Role-based Access Control (Admin, Warden, Student)
-- RESTful API Architecture
-- MongoDB Database
-- Password Hashing with bcrypt
+- **Authentication**: JWT login/register, protected routes
+- **Roles**: Admin / Warden / Student with authorization guards
+- **Modules**:
+  - Users
+  - Students + room assignment/deallocation
+  - Rooms (create/update/delete, occupancy tracking)
+  - Fees (create/mark paid/delete; student view + invoice/receipt download)
+  - Complaints (student submit; admin/warden resolve + status workflow)
+  - Leave requests (student submit; admin/warden approve/reject)
+  - Visitors (student register; admin/warden approve/deny + mark exit)
+  - Notices, Mess menu/records
+- **Security**: helmet, rate limiting, sanitization, centralized error handling
+- **Modern UI**: responsive forms/tables with consistent design system
 
-## Installation
+---
 
-1. Install dependencies:
+## Tech Stack
+
+**Backend**
+- Node.js, Express.js
+- MongoDB, Mongoose
+- JWT, bcrypt
+- express-validator, helmet, rate-limit, sanitizers
+
+**Frontend**
+- React (Vite)
+- React Router
+- Axios (central instance + interceptors)
+- Tailwind + custom reusable CSS classes (`card`, `input`, `select`, `textarea`, `table`, `badge`, `btn`)
+- jsPDF (fee invoice/receipt PDF)
+
+---
+
+## Installation & Setup
+
+### 1) Clone and install
+
 ```bash
-npm install
+git clone https://github.com/NrushanshGarasia/SDP_PROJECT.git
+cd SDP_PROJECT
 ```
 
-2. Create a `.env` file in the root directory (copy from `.env.example`):
+### 2) Backend environment variables
+
+Create `.env` in the project root:
+
 ```env
 PORT=5000
 NODE_ENV=development
 MONGODB_URI=mongodb://localhost:27017/hostel_management
-JWT_SECRET=your_super_secret_jwt_key_change_this_in_production
+JWT_SECRET=change_this_secret
 JWT_EXPIRE=7d
 ```
 
-**Important:** Make sure MongoDB is running on your system before starting the server.
+### 3) Run backend
 
-3. Start the server:
 ```bash
-# From the root directory (recommended)
-npm start          # Production mode
-npm run dev        # Development mode (with nodemon)
-
-# OR from the server directory
-cd server
-npm start          # Production mode
-npm run dev        # Development mode
+npm install
+npm run dev
 ```
 
-**Note:** The `.env` file should be in the root directory of the project.
+Backend will run on `http://localhost:5000`.
 
-## API Endpoints
+### 4) Run frontend
 
-### Authentication
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user (Protected)
+```bash
+cd Frontend
+npm install
+npm run dev
+```
 
-### Users (Admin only)
-- `GET /api/users` - Get all users
-- `GET /api/users/:id` - Get single user
-- `PUT /api/users/:id` - Update user
-- `PUT /api/users/:id/toggle-status` - Activate/Deactivate user
-- `DELETE /api/users/:id` - Delete user
+Frontend will run on Vite (typically `http://localhost:5173`) and proxies `/api` to the backend.
 
-### Students
-- `GET /api/students` - Get all students (Admin, Warden)
-- `GET /api/students/me` - Get my profile (Student)
-- `GET /api/students/:id` - Get single student
-- `POST /api/students` - Create student (Admin, Warden)
-- `PUT /api/students/:id` - Update student (Admin, Warden)
-- `PUT /api/students/:id/assign-room` - Assign room to student
-- `DELETE /api/students/:id` - Delete student (Admin)
+---
 
-### Rooms
-- `GET /api/rooms` - Get all rooms
-- `GET /api/rooms/:id` - Get single room
-- `POST /api/rooms` - Create room (Admin, Warden)
-- `PUT /api/rooms/:id` - Update room (Admin, Warden)
-- `DELETE /api/rooms/:id` - Delete room (Admin)
+## Folder Structure
 
-### Fees
-- `GET /api/fees` - Get all fees (Admin, Warden)
-- `GET /api/fees/me` - Get my fees (Student)
-- `GET /api/fees/:id` - Get single fee
-- `POST /api/fees` - Create fee (Admin, Warden)
-- `PUT /api/fees/:id` - Update fee (Admin, Warden)
-- `PUT /api/fees/:id/pay` - Pay fee
-- `DELETE /api/fees/:id` - Delete fee (Admin)
+```text
+HostelManagementSystem/
+├─ server/
+│  ├─ config/          # DB connection
+│  ├─ controllers/     # Route handlers
+│  ├─ middleware/      # Auth, security, error handling, validation
+│  ├─ models/          # Mongoose schemas
+│  ├─ routes/          # API routes
+│  ├─ services/        # Business logic layer
+│  └─ index.js         # Server entry point
+├─ Frontend/
+│  ├─ src/
+│  │  ├─ components/   # Layout, ProtectedRoute, shared UI
+│  │  ├─ context/      # AuthContext
+│  │  ├─ pages/        # Role-based pages
+│  │  └─ utils/        # Axios instance
+│  └─ vite.config.js   # Proxy config
+├─ .env                # ignored
+└─ README.md
+```
 
-### Complaints
-- `GET /api/complaints` - Get all complaints (Admin, Warden)
-- `GET /api/complaints/me` - Get my complaints (Student)
-- `GET /api/complaints/:id` - Get single complaint
-- `POST /api/complaints` - Create complaint (Student)
-- `PUT /api/complaints/:id` - Update complaint (Admin, Warden)
-- `PUT /api/complaints/:id/resolve` - Resolve complaint (Admin, Warden)
-- `DELETE /api/complaints/:id` - Delete complaint (Admin)
+---
 
-### Leave Requests
-- `GET /api/leave-requests` - Get all leave requests (Admin, Warden)
-- `GET /api/leave-requests/me` - Get my leave requests (Student)
-- `GET /api/leave-requests/:id` - Get single leave request
-- `POST /api/leave-requests` - Create leave request (Student)
-- `PUT /api/leave-requests/:id` - Update leave request (Student)
-- `PUT /api/leave-requests/:id/approve` - Approve/Reject leave request (Admin, Warden)
-- `DELETE /api/leave-requests/:id` - Delete leave request (Student)
+## Common Scripts
 
-### Visitors
-- `GET /api/visitors` - Get all visitors (Admin, Warden)
-- `GET /api/visitors/me` - Get my visitors (Student)
-- `GET /api/visitors/:id` - Get single visitor
-- `POST /api/visitors` - Create visitor entry (Student)
-- `PUT /api/visitors/:id` - Update visitor (Admin, Warden)
-- `PUT /api/visitors/:id/exit` - Mark visitor exit (Admin, Warden)
-- `DELETE /api/visitors/:id` - Delete visitor (Admin)
+**Backend (root)**
+- `npm run dev` – start backend in development
+- `npm start` – start backend in production
 
-### Notices
-- `GET /api/notices` - Get all notices
-- `GET /api/notices/active` - Get active notices
-- `GET /api/notices/:id` - Get single notice
-- `POST /api/notices` - Create notice (Admin, Warden)
-- `PUT /api/notices/:id` - Update notice (Admin, Warden)
-- `DELETE /api/notices/:id` - Delete notice (Admin, Warden)
+**Frontend (`Frontend/`)**
+- `npm run dev` – start frontend dev server
+- `npm run build` – build frontend
+- `npm run preview` – preview production build
 
-### Mess Management
-- `GET /api/mess/records` - Get all mess records (Admin, Warden)
-- `GET /api/mess/records/me` - Get my mess records (Student)
-- `POST /api/mess/records` - Create mess record (Admin, Warden)
-- `PUT /api/mess/records/:id` - Update mess record (Admin, Warden)
-- `DELETE /api/mess/records/:id` - Delete mess record (Admin, Warden)
-- `GET /api/mess/menu` - Get all menus
-- `GET /api/mess/menu/:day` - Get menu by day
-- `POST /api/mess/menu` - Create/Update menu (Admin, Warden)
-- `DELETE /api/mess/menu/:id` - Delete menu (Admin, Warden)
+---
 
-## User Roles
+## API (high level)
 
-- **Admin**: Full system access
-- **Warden**: Manage hostel operations
-- **Student**: Access personal information and submit requests
+All APIs are under `/api/*` (auth required unless otherwise noted).
 
-## Security Features
+- **Auth**: `/api/auth/*`
+- **Users**: `/api/users/*` (admin)
+- **Students**: `/api/students/*`
+- **Rooms**: `/api/rooms/*`
+- **Fees**: `/api/fees/*`
+- **Complaints**: `/api/complaints/*`
+- **Leave requests**: `/api/leave-requests/*`
+- **Visitors**: `/api/visitors/*`
+- **Notices**: `/api/notices/*`
+- **Mess**: `/api/mess/*`
 
-- **Helmet.js** - Security headers
-- **Rate Limiting** - Prevent brute force attacks
-- **Data Sanitization** - Protection against NoSQL injection and XSS
-- **HPP** - HTTP Parameter Pollution protection
-- **JWT Authentication** - Secure token-based authentication
-- **Password Hashing** - bcrypt for password encryption
-- **Role-based Access Control** - Admin, Warden, Student roles
+---
 
-## Development Status
+## Notes
 
-✅ **STEP 1: Backend Setup** - Complete
-- Node.js with Express
-- MongoDB connection
-- Folder structure
-- JWT authentication
-- Role-based access control
-
-✅ **STEP 2: Backend Modules** - Complete
-- Users management
-- Students management
-- Rooms management
-- Fees management
-- Complaints management
-- Leave Requests management
-- Visitors management
-- Notices management
-- Mess Management
-
-✅ **STEP 3: Error Handling & Security** - Complete
-- Global error middleware
-- Password hashing
-- JWT token handling
-- Environment variable protection
-- Security middleware (Helmet, Rate Limiting, XSS, NoSQL injection protection)
-
-## Troubleshooting
-
-### Server won't start
-1. Make sure MongoDB is running: `mongod` or start MongoDB service
-2. Check if `.env` file exists and has correct values
-3. Verify `MONGODB_URI` in `.env` matches your MongoDB connection string
-4. Check if port 5000 is available or change `PORT` in `.env`
-
-### MongoDB Connection Error
-- Ensure MongoDB is installed and running
-- Check MongoDB connection string in `.env`
-- Verify MongoDB is accessible on the specified host and port
+- If you see `README.md` merge conflicts, resolve them and commit before pushing.
+- If MongoDB is not running locally, start it before running the backend.
